@@ -1,3 +1,4 @@
 # pandaRepo
 robbi2 panda repository
-Hello world!
+
+Some AngularJS files from my ex-projects
