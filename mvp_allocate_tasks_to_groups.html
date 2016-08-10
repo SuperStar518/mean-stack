@@ -1,0 +1,289 @@
+<link href="css/Task Manager/allocate.css" rel="stylesheet" />        
+
+<style>
+    #groupModal .modal-footer {
+        padding: 10px;
+    }
+    #groupModal .modal-header {
+        padding: 10px;
+    }
+    #groupModal .modal-body {
+        padding: 10px;
+    }
+    #groupModal #inputGroupName {
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #D4C9C9;
+        width: 94.5%;
+    }
+    #groupModal .modal-footer {
+        padding: 10px;
+    }
+
+</style>
+
+<!-- START OF MAIN CONTENTS -->
+<div id="main" set-height-allocate>
+    
+    <div class="container" style="width:960px; height: 100%; overflow-x:hidden;overflow-y:scroll;">
+        <div class="TaskAndGroupContainer" style="width:80%;height: 100%;" ng-init="initEl()">	 
+            <!-- <input type="button" class="save-c" value="Save" style="margin-bottom: 2%;margin-right: 0px;"> -->
+            <!-- Allocate Tasks Start-->
+            <div id="wrapper" style="height: 100%;">
+                <!-- Page Content -->
+                <div id="page-content-wrapper" style="height: 100%;">
+                    <!-- <div class="container-fluid allocate" style="height: 100%;"> -->
+                    <div class="container-fluid allocate" style="height:100%;">
+                        <div class="scrollbar tasksParent" style="width:50%;height:100%;float:left;border-color: #EEF2F3; ">
+                            <div class="taskHead" ng-click="isCollapsed = !isCollapsed">Tasks</div>
+                            <div class="tasks" ollapse="isCollapsed"
+                                 style=" height: 100%; background-color:white;overflow:auto;padding: 30px 15px;border-right: 1px solid #F1F4F5;">
+                                <div class="clearfix"></div>
+                                <ul id="groupItems1" class="itemsList ui-sortable" as-sortable="dragControlListeners" ng-model="unassignedGroup.groupTasks">
+                                    <li class="left1 ui-sortable-handle" style="position: relative;" 
+                                        ng-repeat="task in unassignedGroup.groupTasks" as-sortable-item>
+                                        <div class="inner-addon left-addon col-md-12" as-sortable-item-handle 
+                                             ng-mousedown="mousedown()">
+                                            <i class="glyphicon">
+                                                <img src="images/drag_handle.png">
+                                            </i>
+                                            <div class="taskDesc" style="display:inline-block;">
+                                                <label>{{task.name}}</label>
+                                                <span>{{priorityOptions[task.priority]}} {{task.duration}}</span>
+                                                <img src="images/rolling.gif" height="18" width="18" style="position:absolute;right: 0;top: 0;" ng-show="task.activeRequest">
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="taskGroupParent" style="width:50%;height: 100%;  float:left;">
+
+                            <div class="taskGroupHead">Task Groups</div>                               
+                            <div class="addNewTaskGroup">
+                                <h3>
+                                    <a href id="btnadd" ng-click="openGroupModal()">+ Add New Task Group</a>
+                                </h3>
+                            </div>
+                            <div style="background-color:white;padding:2px 15px;overflow:auto;padding-bottom: 30px;">
+                                <ul id="report-template" class="groupsList ui-sortable"  as-sortable="dragGroupControlListeners" ng-model="groups">
+                                    <li class="taskGroup " ng-repeat="group in groups" as-sortable-item>
+                                        <div id="report-template" class="groupsList" >
+                                            <div class="col-md-8">
+                                                <div style="float:left">
+                                                    <img as-sortable-item-handle src="images/drag_handle.png" style="display: inline-block;">
+                                                    <img src="images/rolling.gif" style="display: inline-block;" height="18" width="18" ng-show="group.activeRequest">
+                                                    <h3 ng-click="singleClick($index)"
+                                                        ng-dblclick="doubleClick($index)"
+                                                        style="color:#3ea3c1;padding:5px;display:inline-block;cursor:pointer;">
+                                                        {{group.name}}
+                                                    </h3>
+                                                    <div style="clear:both;"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <span>
+                                                    Duration:
+                                                    <input class="dur col-md-5 setRight" type="number" ng-model="group.duration" ng-keyup="$event.keyCode == 13 && editGroupDuration(group)" ng-blur="editGroupDuration(group)">
+                                                </span>
+                                                <span>
+                                                    <img id="1" class="min" ng-src="{{ $localStorage.isCollapsed[$index].isCollapsed?'images/maximize.png':'images/minimize3.png'}}" 
+                                                         ng-click="$localStorage.isCollapsed[$index].isCollapsed = !$localStorage.isCollapsed[$index].isCollapsed">
+                                                </span>
+                                                <span>
+                                                    <img style="cursor:pointer;" src="images/delete.png"  ng-click="confirmDeleteGroup(group)">
+                                                </span>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>                                        
+
+                                        <ul id="groupItems1" class="itemsList ui-sortable" as-sortable="dragControlListeners" ng-model="group.groupTasks" ng-style="{'display': $localStorage.isCollapsed[$index].isCollapsed?'none':'block'}">
+                                            <li class="left1 ui-sortable-handle" ng-repeat="grouptask in group.groupTasks" 
+                                                as-sortable-item ng-mouseup="mouseup()">
+                                                <div class="inner-addon left-addon col-md-12" ng-mousedown="mousedown()" 
+                                                     as-sortable-item-handle>
+                                                    <i class="glyphicon">
+                                                        <img src="images/drag_handle.png">
+                                                    </i>
+                                                    <div class="taskDesc" style="position:relative;">
+                                                        <label>{{grouptask.name}}</label>
+                                                        <span>{{priorityOptions[grouptask.priority]}} {{grouptask.duration}}</span>
+                                                        <img src="images/rolling.gif" height="18" width="18" style="position:absolute;right: 0;top: 0;" ng-show="grouptask.activeRequest">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /#page-content-wrapper -->
+
+            <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+
+            <script src="js/Task Manager/bootstrap.min.js"></script>
+            <script src="js/Task Manager/sidebar.js"></script>
+
+            <!-- Allocate Tasks Ends-->
+
+            <div style="clear:both;"></div>
+        </div>
+    </div>
+</div>
+<!-- END OF MAIN CONTENTS -->
+<div class="clear"></div>
+<script type="text/ng-template" id="save-group">
+    <div class="modal fade" id="groupModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Group Name</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <input type="hidden" id="inputHidden" />
+                            <input type="text" required class="form-control" id="inputGroupName" ng-model="groupName"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button"  ng-click="saveGroup(groupName)">OK</button>
+                    <button class="btn btn-warning" type="button" ng-click="closeThisDialog()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/ng-template" id="delete-confirm">
+    <div class="ngdialog-message">
+        <h2>Confirm Delete</h2>
+        <div>Are you sure, you want to delete?
+            <button type="button" class="ngdialog-button ngdialog-button-primary" ng-click="deleteGroup()"> Delete </button>
+        </div>
+    </div>
+</script>
+<style>
+
+    .addNewTaskGroup #btnadd{
+        text-decoration: none;
+        color: #2590af;
+    }
+
+    .addNewTaskGroup h3{
+        background-color: #f0f0f0;
+        max-height: 240px;
+        overflow: auto;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    .column{
+        min-height: 30px;
+        border-style: solid;
+        border-width: 1px;
+        border-color: #D2D2D3;
+        padding: 2px;
+        cursor: move;
+        border-radius: 0px;
+        border-radius: 5px;
+        margin-bottom: 6px;
+        color: #475565;
+        background: white;
+
+    }
+
+
+    /*
+     *  STYLE 1
+     */
+
+    .taskGroup::-webkit-scrollbar-track, .tasks::-webkit-scrollbar-track
+    {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        border-radius: 10px;
+        background-color: #F5F5F5;
+    }
+
+    .taskGroup .col-md-4{
+        text-align: right;margin-bottom: 9px;
+    }
+
+    .taskGroup .col-md-4 input{
+        border-radius: 5px; border-style: solid; border-width: 1px; border-color: DarkGray; padding: 5px; max-width: 50px;
+    }
+
+    .taskGroup::-webkit-scrollbar, .tasks::-webkit-scrollbar
+    {
+        width: 7px;
+        background-color: #F5F5F5;
+    }
+
+    .taskGroup::-webkit-scrollbar-thumb, .tasks::-webkit-scrollbar-thumb
+    {
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+        background-color: #B3A4A4;
+    }
+
+    @media screen and (max-width: 1200px) {
+
+        .TaskAndGroupContainer{
+            width: 100% !important;
+        }  
+        .taskGroupParent, .tasksParent {
+            width: 45% !important;
+        }
+
+        .save-c{
+            margin-right: 10% !important;;
+        }
+    }
+
+
+    @media screen and (max-width: 700px) {
+
+        .taskGroupParent, .tasksParent {
+            width: 85% !important;
+        }
+        .save-c{
+            margin-right: 15% !important;;
+        }
+    }
+
+    .taskHead{
+        margin-bottom: 10px; font-size: 15px;
+    }
+
+    .taskGroupHead{
+        margin-bottom: 10px; font-size: 15px;
+        padding-left:15px;
+    }
+
+
+    .tasksParent .tasks ul li, .taskGroupParent.tasks ul li {
+        min-height: 30px;
+        border-style: solid;
+        border-width: 1px;
+        border-color: #D2D2D3;
+        padding: 2px;
+        cursor: move;
+        border-radius: 0px;
+        border-radius: 5px;
+        color: #475565;
+        background: white;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        margin-bottom: 6px;
+    }
+
+    .tasksParent .tasks ul, .taskGroupParent ul{
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+</style>
